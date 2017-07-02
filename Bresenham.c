@@ -15,8 +15,6 @@
 
 bool g_debug = true;
 
-int main(){return 0;}
-
 void PlotLineInternal(Point, Point, void(*)(void), void(*)(void), void(*)(void));
 //these functions will move the motor in one step in the specified direction
 void StepXp();
