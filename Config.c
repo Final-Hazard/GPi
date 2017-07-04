@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "Constants.h"
 
 const char* CONFIG_NAME = "pinout.config";
 const int LINE_SIZE = 256;
@@ -14,13 +15,6 @@ const char CONFIGURABLE_VALUES[][10] = {"motorxa1", "motorxa2", "motorxb1", "mot
 "limitsel0", "limitsel1", "limitsel2", "limitin", "pwmpin", "pinmode"};
 //if adding or removing values don't forget to change the list size as well
 const int LIST_SIZE = 18;
-
-int main()
-{
-	if(ReadConfig() != 0)
-		printf("error reading\n");
-	return 0;
-}
 
 int ReadConfig()
 {
@@ -116,6 +110,33 @@ int ReadConfig()
 	return returnValue;
 }
 
+void PrintConfig()
+{
+	char axis, letter, number;
+	for(int i = 0; i < NUM_MOTORS; i++)
+	{
+		for(int j = 0; j < NUM_MOTOR_CONTROL_PINS; j++)
+		{
+			if(i == 0) axis = 'x';
+			if(i == 1) axis = 'y';
+			if(i == 2) axis = 'z';
+			if(j / 2 == 0) letter = 'a';
+			else letter = 'b';
+			if(j % 2 == 0) number = '1';
+			else number = '2';
+			printf("motor%c%c%c = %d\n", axis, letter, number, motorArr[i][j]);
+		}
+	}
+	
+	for(int i = 0; i < NUM_LIMIT_SELECT_PINS; i++)
+	{
+		number = '0' + i;
+		printf("limitSel%c = %d\n", number, limitSel[i]);
+	}
+	printf("limitIn = %d\n", limitIn);
+	printf("pwmPin = %d\n", pwmPin);
+}
+
 bool IsNewLine(char* line)
 {
 	for(int i = 0; i < LINE_SIZE; i++)
@@ -201,50 +222,56 @@ bool IsIntegerConfigurable(char* string)
 int SetConfigValue(const char* name, long value)
 {
 	printf("setting %s to %ld\n", name, value);
-	if(strcmp(name, "motorxa1") == 0){
-		motorXA1 = value; return 0;
+	char *subString;
+	char fullString[9] = "motorxxx";
+	enum Motor motorDir;
+	int motorIdx = 0, limitIdx;
+	char axis, letter, number;
+	subString = strstr(name, "motor");
+	if(subString != NULL)
+	{
+		//will read strings of the format "motorDL#"
+		//where D = direction 'x', 'y', 'z'; L = letter 'a', 'b'; # = number '1', '2'
+		if(subString[5] != '\0' && subString[6] != '\0' && subString[7] != '\0')
+		{
+			axis = subString[5]; letter = subString[6]; number = subString[7];
+			if((axis == 'x' || axis == 'y' || axis == 'z') && 
+				(letter == 'a' || letter == 'b') && 
+				(number == '1' || number == '2'))
+			{
+				if(subString[5] == 'x')
+					motorDir = MotorX;
+				if(subString[5] == 'y')
+					motorDir = MotorY;
+				if(subString[5] == 'z')
+					motorDir = MotorZ;
+				
+				if(subString[6] == 'b')
+					motorIdx = 2;
+				if(subString[7] == '2')
+					motorIdx++;
+				fullString[5] = axis; fullString[6] = letter; fullString[7] = number;
+				if(strcmp(name, fullString) == 0)
+				{
+					motorArr[motorDir][motorIdx] = value;
+					return 0;
+				}
+			}
+		}
 	}
-	if(strcmp(name, "motorxa2") == 0){
-		motorXA2 = value; return 0;
-	}
-	if(strcmp(name, "motorxb1") == 0){
-		motorXB1 = value; return 0;
-	}
-	if(strcmp(name, "motorxb2") == 0){
-		motorXB2 = value; return 0;
-	}
-	if(strcmp(name, "motorya1") == 0){
-		motorYA1 = value; return 0;
-	}
-	if(strcmp(name, "motorya2") == 0){
-		motorYA2 = value; return 0;
-	}
-	if(strcmp(name, "motoryb1") == 0){
-		motorYB1 = value; return 0;
-	}
-	if(strcmp(name, "motoryb2") == 0){
-		motorYB2 = value; return 0;
-	}
-	if(strcmp(name, "motorza1") == 0){
-		motorZA1 = value; return 0;
-	}
-	if(strcmp(name, "motorza2") == 0){
-		motorZA2 = value; return 0;
-	}
-	if(strcmp(name, "motorzb1") == 0){
-		motorZB1 = value; return 0;
-	}
-	if(strcmp(name, "motorzb2") == 0){
-		motorZB2 = value; return 0;
-	}
-	if(strcmp(name, "limitsel0") == 0){
-		limitSel0 = value; return 0;
-	}
-	if(strcmp(name, "limitsel1") == 0){
-		limitSel1 = value; return 0;
-	}
-	if(strcmp(name, "limitsel2") == 0){
-		limitSel2 = value; return 0;
+	subString = strstr(name, "limitsel");
+	if(subString != NULL)
+	{
+		if(subString[8] != '\0')
+		{
+			number = subString[8];
+			limitIdx = (int) (number - '0');
+			if(limitIdx >= 0 && limitIdx < NUM_LIMIT_SELECT_PINS)
+			{
+				limitSel[limitIdx] = value;
+				return 0;
+			}
+		}
 	}
 	if(strcmp(name, "limitin") == 0){
 		limitIn = value; return 0;
