@@ -25,4 +25,5 @@ int SetConfigValue(const char* name, long value);
 bool IsConfigurableValue(char* string);
 bool IsIntegerConfigurable(char* string);
 void PrintConfig();
+bool SetupWiringPi();
 #endif

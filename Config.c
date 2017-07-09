@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <wiringPi.h>
 #include "Constants.h"
 
 const char* CONFIG_NAME = "pinout.config";
@@ -135,6 +136,37 @@ void PrintConfig()
 	}
 	printf("limitIn = %d\n", limitIn);
 	printf("pwmPin = %d\n", pwmPin);
+}
+
+bool SetupWiringPi()
+{
+	if(ConfiguredPinMode == WiringPi)
+		wiringPiSetup();
+	else if(ConfiguredPinMode == GPIO)
+		wiringPiSetupGpio();
+	else
+	{
+		printf("Unable to configure WiringPi");
+		return false;
+	}
+	
+	//Set motor pins to out
+	for(int i = 0; i < NUM_MOTORS; i++)
+	{
+		for(int j = 0; j < NUM_MOTOR_CONTROL_PINS; j++)
+		{
+			pinMode(motorArr[i][j], OUTPUT);
+		}
+	}
+	//set selector pins to out
+	for(int i = 0; i < NUM_LIMIT_SELECT_PINS; i++)
+	{
+		pinMode(limitSel[limitIdx], OUTPUT);
+	}
+	//set selector pin Input
+	pinMode(limitIn, INPUT);
+	//set PWM pin
+	pinMode(pwmPin, PWM_OUTPUT);
 }
 
 bool IsNewLine(char* line)

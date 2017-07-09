@@ -3,15 +3,8 @@
 #ifdef DEBUG
 #include "Bresenham.h"
 
-//testing variables
-int g_x;
-int g_y;
-int g_z;
-Point *g_arr;
-int g_steps;
-
-
 void Test();
+void CheckResults(Stack *stack, Point *expected, int size);
 void TestNoMove();
 void Test1a();
 void Test2a();

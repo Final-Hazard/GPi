@@ -1,5 +1,6 @@
 #ifndef BRESENHAM_H
 #define BRESENHAM_H
+#include "MovementStack.h"
 
 typedef struct point
 {
@@ -9,6 +10,6 @@ typedef struct point
 } Point;
 
 int ffloor(float f);
-void PlotLine(Point, Point);
+void PlotLine(Point start, Point end, Stack* movementStack);
 
 #endif

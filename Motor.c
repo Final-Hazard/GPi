@@ -1,4 +1,5 @@
 #include "Motor.h"
+#include "Config.h"
 //#include <WiringPi.h>
 
 const int MOTOR_PHASE_MIN = 0;

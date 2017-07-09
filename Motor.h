@@ -1,7 +1,5 @@
 #ifndef MOTOR_H
 #define MOTOR_H
-//#Include WiringPi.h
-#include "Config.h"
 #include "Constants.h"
 
 enum MotorPhase {Phase1, Phase2, Phase3, Phase4};
