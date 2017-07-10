@@ -17,7 +17,7 @@ int limitIn, pwmPin;
 
 extern const char CONFIGURABLE_VALUES[][10];
 
-int ReadConfig();
+bool ReadConfig();
 bool IsNewLine(char* line);
 char* Trim(char* string);
 char* ToLower(char* string);

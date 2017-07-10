@@ -1,7 +1,7 @@
 TARGET = Interpreter
-LIBS = -lm
+LIBS = -lm -lwiringPi
 CC = gcc
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -std=c99
 
 .PHONY: default all clean
 

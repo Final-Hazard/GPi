@@ -1,4 +1,4 @@
-#include "config.h"
+#include "Config.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -17,19 +17,19 @@ const char CONFIGURABLE_VALUES[][10] = {"motorxa1", "motorxa2", "motorxb1", "mot
 //if adding or removing values don't forget to change the list size as well
 const int LIST_SIZE = 18;
 
-int ReadConfig()
+bool ReadConfig()
 {
 	FILE *file = fopen(CONFIG_NAME, "r");
 	char line[LINE_SIZE];
 	char *variable, *value, *unused;
 	long nValue;
 	bool pinmodeSet = false;
-	int returnValue = 0;
+	bool returnValue = true;
 	
 	if(file == NULL)
 	{	
 		printf("Error reading file %s\n", CONFIG_NAME);
-		return -1;
+		return false;
 	}
 	while(fgets(line, LINE_SIZE, file))
 	{
@@ -59,7 +59,7 @@ int ReadConfig()
 			if(SetConfigValue(variable, nValue) != 0)
 			{
 				printf("Unable to configure %s\n", variable);
-				returnValue = -1;
+				returnValue = false;
 			}
 		}
 		else{
@@ -79,7 +79,7 @@ int ReadConfig()
 					else
 					{
 						printf("unknown pinmode '%s'\n", value);
-						returnValue = -1;
+						returnValue = false;
 					}
 				}
 			}
@@ -96,7 +96,7 @@ int ReadConfig()
 		if(pwmPin != 1)
 		{
 			printf("Only WiringPi pin 1 supports PWM\n");
-			return -1;
+			return false;
 		}
 	}
 	if(ConfiguredPinMode == GPIO)
@@ -104,10 +104,9 @@ int ReadConfig()
 		if(pwmPin != 18)
 		{
 			printf("Only GPIO pin 18 supports PWM\n");
-			return -1;
+			return false;
 		}
 	}
-		
 	return returnValue;
 }
 
@@ -140,33 +139,36 @@ void PrintConfig()
 
 bool SetupWiringPi()
 {
-	if(ConfiguredPinMode == WiringPi)
-		wiringPiSetup();
-	else if(ConfiguredPinMode == GPIO)
-		wiringPiSetupGpio();
-	else
+  if(ConfiguredPinMode == WiringPi){
+    wiringPiSetup();
+  }
+  else if(ConfiguredPinMode == GPIO){
+    wiringPiSetupGpio();
+  }
+  else
+    {
+      printf("Unable to configure WiringPi");
+      return false;
+    }
+  
+  //Set motor pins to out
+  for(int i = 0; i < NUM_MOTORS; i++)
+    {
+      for(int j = 0; j < NUM_MOTOR_CONTROL_PINS; j++)
 	{
-		printf("Unable to configure WiringPi");
-		return false;
+	  pinMode(motorArr[i][j], OUTPUT);
 	}
-	
-	//Set motor pins to out
-	for(int i = 0; i < NUM_MOTORS; i++)
-	{
-		for(int j = 0; j < NUM_MOTOR_CONTROL_PINS; j++)
-		{
-			pinMode(motorArr[i][j], OUTPUT);
-		}
-	}
-	//set selector pins to out
-	for(int i = 0; i < NUM_LIMIT_SELECT_PINS; i++)
-	{
-		pinMode(limitSel[limitIdx], OUTPUT);
-	}
-	//set selector pin Input
-	pinMode(limitIn, INPUT);
-	//set PWM pin
-	pinMode(pwmPin, PWM_OUTPUT);
+    }
+  //set selector pins to out
+  for(int i = 0; i < NUM_LIMIT_SELECT_PINS; i++)
+    {
+      pinMode(limitSel[i], OUTPUT);
+    }
+  //set selector pin Input
+  pinMode(limitIn, INPUT);
+  //set PWM pin
+  pinMode(pwmPin, PWM_OUTPUT);
+  return true;
 }
 
 bool IsNewLine(char* line)

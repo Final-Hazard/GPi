@@ -1,6 +1,6 @@
 #include "Motor.h"
 #include "Config.h"
-//#include <WiringPi.h>
+#include <wiringPi.h>
 
 const int MOTOR_PHASE_MIN = 0;
 const int MOTOR_PHASE_MAX = 3;
@@ -30,10 +30,8 @@ void StepMotorNegative(enum Motor motor, enum MotorPhase currrentPhase)
 	SetMotorOutputs(motor, MOTOR_PHASE_ARRAY[phase]);
 }
 
-void DigitalWrite(int a, int b){}
-
 void SetMotorOutputs(enum Motor motor, const int output[NUM_MOTOR_CONTROL_PINS])
 {
 	for(int i = 0; i < NUM_MOTOR_CONTROL_PINS; i++)
-		DigitalWrite(motorArr[motor][i], output[i]);
+		digitalWrite(motorArr[motor][i], output[i]);
 }
