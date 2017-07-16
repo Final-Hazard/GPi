@@ -16,9 +16,10 @@ extern const int MOTOR_PHASE_MAX;
 extern const int MOTOR_PHASE_ARRAY[NUM_MOTOR_PHASES][NUM_MOTOR_CONTROL_PINS];
 
 //drive the given motor one step positive (ClockWise)
-void StepMotorPositive(enum Motor motor, enum MotorPhase currentPhase);
+void StepMotorPositive(enum Motor motor, enum MotorPhase *currentPhase);
 //drive the given motor one step negative (CounterClockWise)
-void StepMotorNegative(enum Motor motor, enum MotorPhase currentPhase);
+void StepMotorNegative(enum Motor motor, enum MotorPhase *currentPhase);
 //set the actual low level hardware outputs. 0 for low, 1 for high
 void SetMotorOutputs(enum Motor motor, const int outputs[NUM_MOTOR_CONTROL_PINS]);
+void Reset();
 #endif
