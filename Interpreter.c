@@ -6,7 +6,7 @@
 #include "Movement.h"
 #include "Motor.h"
 #include "MovementStack.h"
-#include <time.h>
+#include "Sleep.h"
 //#include <WiringPi.h>
 
 int main(int argc, char** args)
@@ -32,22 +32,15 @@ int main(int argc, char** args)
   printf("(%f, %f, %f)\n", p0.x, p0.y, p0.z);*/
   //digitalWrite(motorArr[0][0],1);
   enum MotorPhase phase = 0;
-  struct timespec sleepTime;
-  sleepTime.tv_sec = 0;
-  sleepTime.tv_nsec = 1000 * 1000;
-  for(int i = 0; i < 500; i++)
+  
+  int micros = 1000 * 1000;
+  int iters = 10 * 1000 * 1000 / micros;
+  for(int i = 0; i < iters; i++)
   {
     StepMotorPositive(MotorZ, &phase);
-    if(phase > 3) phase = 0;
-    nanosleep(&sleepTime, NULL);
+    Sleep(micros);
   }
-  /*
-  for(int i = 0; i < 10; i++)
-  {
-    StepMotorNegative(MotorZ, &phase);
-    printf("%d\n", phase);
-    if(phase < 0 || phase > 100) phase = 3;
-    sleep(1);
-    }*/
+  
+  
   Reset();
 }

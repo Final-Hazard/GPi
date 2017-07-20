@@ -1,5 +1,5 @@
 TARGET = Interpreter
-LIBS = -lm -lwiringPi
+LIBS = -lm -lwiringPi -lrt
 CC = gcc
 CFLAGS = -g -Wall -std=gnu99
 
